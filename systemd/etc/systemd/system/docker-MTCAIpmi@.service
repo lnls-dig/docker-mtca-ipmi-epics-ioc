@@ -1,0 +1,19 @@
+[Unit]
+Description=MTCA IPMI  container instance %I
+Requires=docker.service
+After=docker.service
+
+[Service]
+Restart=always
+RestartSec=2
+EnvironmentFile=/etc/sysconfig/docker-mtca-ipmi-epics-ioc
+EnvironmentFile=/etc/sysconfig/docker-mtca-ipmi-epics-ioc-mapping
+Environment=IMAGE_VERSION=1.0.0-base-3.15-debian-9
+# Used inside runMTCAIpmi script
+Environment=MTCA_IPMI_INSTANCE=%i
+ExecStartPre=-/usr/bin/docker pull lnlsdig/mtca-ipmi-epics-ioc:${IMAGE_VERSION}
+ExecStart=/usr/local/bin/runMTCAIpmi.sh
+ExecStop=/usr/local/bin/stopMTCAIpmi.sh
+
+[Install]
+WantedBy=multi-user.target
