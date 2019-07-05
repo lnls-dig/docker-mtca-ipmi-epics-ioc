@@ -78,6 +78,7 @@ RUN echo "nameserver 10.0.0.71" >> /etc/resolv.conf && \
     ./configure && \
     make && \
     make install && \
+    cd .. && \
     rm -rf ipmitool-${IPMITOOL_VERSION}.tar.bz2 && \
     rm -rf ipmitool-${IPMITOOL_VERSION}
 
