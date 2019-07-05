@@ -42,4 +42,8 @@ To build the image locally without downloading it from Docker Hub, clone the
 repository and run the `docker build` command:
 
     git clone https://gitlab.cnpem.br/DIG/mtca-ipmi-epics-ioc
-    docker build -t lnlsdig/mtca-ipmi-epics-ioc docker-mtca-ipmi-epics-ioc .
+    docker build -t lnlsdig/mtca-ipmi-epics-ioc --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/id_rsa)" .
+
+Take a breath and stay calm. Your SSH prvate key will not be contained in the final
+image. After we clone the repo from private gitlab we start a new build with just
+the repo contents. Clap of hands for multi-stage builds...
