@@ -74,7 +74,7 @@ RUN echo "nameserver 10.0.0.71" >> /etc/resolv.conf && \
     git checkout ${COMMIT} && \
     echo 'EPICS_BASE=/opt/epics/base' > configure/RELEASE.local && \
     echo 'PYDEVSUP=/opt/epics/${PY_DEVSUP}' >> configure/RELEASE.local && \
-    echo 'IPMITOOL=/usr/bin' >> configure/RELEASE.local && \
+    echo 'IPMITOOL=/usr/local/bin' >> configure/RELEASE.local && \
     make && \
     make install
 
