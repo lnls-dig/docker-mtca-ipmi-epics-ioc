@@ -1,8 +1,35 @@
+FROM lnls/epics-dist:base-3.15-synapps-lnls-R1-2-1-debian-9.5 as builder
+
+ENV IOC_REPO mtca-ipmi-epics-ioc
+ENV COMMIT lnls-target
+
+# Clone Our IOC for later usage. Let's just get rid of the
+# private SSH key as soon as possible. We will not build the IOC
+# just yet.
+ARG SSH_PRIVATE_KEY
+
+RUN mkdir /root/.ssh/
+RUN echo "${SSH_PRIVATE_KEY}" > /root/.ssh/id_rsa && \
+    chmod 700 /root/.ssh/id_rsa && \
+    chown -R root:root /root/.ssh
+
+# MTCA IPMI
+RUN echo "nameserver 10.0.0.71" >> /etc/resolv.conf && \
+    ssh-keyscan -t rsa gitlab.cnpem.br > ~/.ssh/known_hosts && \
+    git clone git@gitlab.cnpem.br:DIG/${IOC_REPO}.git /opt/epics/${IOC_REPO} && \
+    cd /opt/epics/${IOC_REPO} && \
+    git checkout ${COMMIT} && \
+    echo 'EPICS_BASE=/opt/epics/base' > configure/RELEASE.local && \
+    echo 'PYDEVSUP=/opt/epics/${PY_DEVSUP}' >> configure/RELEASE.local && \
+    echo 'IPMITOOL=/usr/local/bin' >> configure/RELEASE.local
+
+# Copy only repo to our new image not our SSH private key
 FROM lnls/epics-dist:base-3.15-synapps-lnls-R1-2-1-debian-9.5
+# copy the repository form the previous image
+COPY --from=builder /opt/epics/${IOC_REPO} /opt/epics/${IOC_REPO}
 
 ENV IOC_REPO mtca-ipmi-epics-ioc
 ENV BOOT_DIR  iocMTCAIpmi
-ENV COMMIT lnls-target
 
 ENV PY_DEVSUP pyDevSup
 ENV PY_DEVSUP_COMMIT master
@@ -11,12 +38,6 @@ ENV IPMITOOL_VERSION 1.8.11
 
 ENV PYTHON=python3.5
 ENV PY_VER=3.5
-
-
-RUN mkdir -p /root.ssh
-ADD id_rsa /root/.ssh/id_rsa
-RUN chmod 700 /root/.ssh/id_rsa && \
-    chown -R root:root /root/.ssh
 
 # For PyDevSup
 RUN echo "nameserver 10.0.0.71" >> /etc/resolv.conf && \
@@ -67,14 +88,7 @@ RUN echo "nameserver 10.0.0.71" >> /etc/resolv.conf && \
         subprocess32
 
 # MTCA IPMI
-RUN echo "nameserver 10.0.0.71" >> /etc/resolv.conf && \
-    ssh-keyscan -t rsa gitlab.cnpem.br > ~/.ssh/known_hosts && \
-    git clone git@gitlab.cnpem.br:DIG/${IOC_REPO}.git /opt/epics/${IOC_REPO} && \
-    cd /opt/epics/${IOC_REPO} && \
-    git checkout ${COMMIT} && \
-    echo 'EPICS_BASE=/opt/epics/base' > configure/RELEASE.local && \
-    echo 'PYDEVSUP=/opt/epics/${PY_DEVSUP}' >> configure/RELEASE.local && \
-    echo 'IPMITOOL=/usr/local/bin' >> configure/RELEASE.local && \
+RUN cd /opt/epics/${IOC_REPO} && \
     make && \
     make install
 
