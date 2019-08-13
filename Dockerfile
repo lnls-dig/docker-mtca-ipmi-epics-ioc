@@ -1,7 +1,7 @@
 FROM lnls/epics-dist:base-3.15-synapps-lnls-R1-2-1-debian-9.5 as builder
 
 ENV IOC_REPO mtca-ipmi-epics-ioc
-ENV COMMIT v1.0.1
+ENV COMMIT v1.1.0
 
 # Clone Our IOC for later usage. Let's just get rid of the
 # private SSH key as soon as possible. We will not build the IOC
