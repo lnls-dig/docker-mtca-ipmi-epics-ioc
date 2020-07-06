@@ -14,7 +14,7 @@ ENV PY_VER=3.5
 
 # MTCA IPMI
 RUN echo "nameserver 10.0.0.71" >> /etc/resolv.conf && \
-    https://github.com/lnls-dig/mtca-ipmi-epics-ioc.git /opt/epics/${IOC_REPO} && \
+    git clone https://github.com/lnls-dig/${IOC_REPO} /opt/epics/${IOC_REPO} && \
     cd /opt/epics/${IOC_REPO} && \
     git checkout ${COMMIT} && \
     echo 'EPICS_BASE=/opt/epics/base' > configure/RELEASE.local && \
